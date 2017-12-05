@@ -1,0 +1,77 @@
+Create table DOCENTES
+(
+Ced_Doc varchar (10) primary key,
+Nom_Doc varchar (15) not null,
+Ape_Doc varchar (15) not null
+);
+
+Create table DIAS
+(
+Id_Dia integer (1) primary key,
+Nom_Dia varchar (9) not null
+);
+
+Create table JORNADAS
+(
+Id_Jor integer primary key auto_increment,
+Id_Dia_Per integer (1) not null references DIAS (Id_Dia),
+Hor_Emp date not null,
+Hor_Ter date not null,
+Ced_Doc_Per varchar (10) not null references DOCENTES (Ced_Doc),
+Des_Jor varchar(20)
+);
+
+Create table RECORDATORIOS
+(
+Id_Rec integer primary key auto_increment,
+Id_Dia_Per integer (1) not null references DIAS (Id_Dia),
+hor_rec date not null,
+Ced_Doc_Per varchar (10) not null references DOCENTES (Ced_Doc),
+Des_rec varchar(20)
+);
+
+
+Create or replace procedure Contar_Horas_Pro(dia,docente,hor_empJ,hor_terJ,descripcion)
+Is
+Hor_empA integer := 0;
+Hor_terA integer:=0;
+Total_horas integer:=0;
+num_jor_dia integer:=0;
+Hor_aux integer:=0;
+muchas_horas exception;
+Begin
+Select count (*) into num_jor_dia
+From jornadas
+Where id_dia_per=dia
+And ced_doc_per=docente;
+
+Select hor_emp,hor_ter into Hor_empA,Hor_terA
+From jornadas
+Where id_dia_per=dia
+And ced_doc_per=docente;
+
+For i in 1..num_jor_dia
+Loop
+Select hor_emp,hor_ter into Hor_empA,Hor_terA
+From jornadas
+Where id_dia_per=dia
+And ced_doc_per=docente;
+
+Hor_aux:=hor_ter-hor_emp;
+Total_horas:=Total_horas+Hor_aux;
+End loop;
+Hor_aux:=hor_terJ-hor_empJ;
+Total_horas:=Total_horas+Hor_aux;
+If Total_horas < 8 then
+Insert into jornadas (id_dia_per,hor_emp,hor_ter,ced_doc_per,des_jor)
+Values (dia,hor_empJ,hor_terJ,docente,descripcion);
+Else
+Raise muchas_horasEnd if;
+Exception
+When muchas_horas then
+Raise_application_error(-20001,'Los horarios asignados sobrepasan el número de horas (8)');
+
+
+End Contar_Horas_Pro;
+.
+/
