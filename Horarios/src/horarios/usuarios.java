@@ -31,6 +31,9 @@ public class usuarios extends javax.swing.JDialog {
     public usuarios(java.awt.Frame parent, boolean modal) {
         super(parent,modal);
         initComponents();
+        pnlFondo fondo = new pnlFondo(this.getWidth(), this.getHeight());
+        this.add(fondo, BorderLayout.CENTER);
+        this.setLocationRelativeTo(null);
         
     }
 //        cargarTablaUsuarios("");

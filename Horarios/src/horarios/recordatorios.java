@@ -52,7 +52,10 @@ public class recordatorios extends javax.swing.JDialog {
         cargarDatosTabla();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         fechaRecordatorio.setDateFormat(sdf);
+        pnlFondo fondo = new pnlFondo(this.getWidth(), this.getHeight());
+        this.add(fondo, BorderLayout.CENTER);
         this.setLocationRelativeTo(null);
+        
     }
 
     /**

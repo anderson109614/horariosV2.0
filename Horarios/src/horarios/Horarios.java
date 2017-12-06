@@ -43,6 +43,8 @@ public class Horarios extends javax.swing.JDialog {
         cmbDias.setSelectedIndex(0);
         modeloDeTabla();
         this.setLocationRelativeTo(null);
+        pnlFondo fondo = new pnlFondo(this.getWidth(), this.getHeight());
+            this.add(fondo, BorderLayout.CENTER);
         //cargarDatosDocente(cedula);
 
     }
