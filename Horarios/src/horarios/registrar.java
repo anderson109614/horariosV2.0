@@ -5,6 +5,8 @@
  */
 package horarios;
 
+import java.awt.BorderLayout;
+
 /**
  *
  * @author Gaby
@@ -18,6 +20,8 @@ public class registrar extends javax.swing.JFrame {
     public registrar() {
         initComponents();
         this.setLocationRelativeTo(null);
+        pnlFondo fondo = new pnlFondo(this.getWidth(), this.getHeight());
+        this.add(fondo, BorderLayout.CENTER);
     }
 
     /**

@@ -33,8 +33,8 @@ public class entrar extends javax.swing.JFrame {
     public entrar() {
         
         initComponents();
-        //pnlFondo fondo = new pnlFondo(this.getWidth(), this.getHeight());
-        //jPanel1.add(fondo, BorderLayout.CENTER);
+        pnlFondo fondo = new pnlFondo(this.getWidth(), this.getHeight());
+        jPanel1.add(fondo, BorderLayout.CENTER);
         lblMensaje.setVisible(false);
         this.setLocationRelativeTo(null);
     }

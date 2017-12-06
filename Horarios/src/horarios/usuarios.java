@@ -5,6 +5,7 @@
  */
 package horarios;
 
+import java.awt.BorderLayout;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -30,6 +31,7 @@ public class usuarios extends javax.swing.JDialog {
     public usuarios(java.awt.Frame parent, boolean modal) {
         super(parent,modal);
         initComponents();
+        
     }
 //        cargarTablaUsuarios("");
 //        
@@ -55,6 +57,9 @@ public class usuarios extends javax.swing.JDialog {
 //    }
     public usuarios() {
         initComponents();
+        pnlFondo fondo = new pnlFondo(this.getWidth(), this.getHeight());
+        this.add(fondo, BorderLayout.CENTER);
+        this.setLocationRelativeTo(null);
     }
 //        cargarTablaUsuarios("");
         
