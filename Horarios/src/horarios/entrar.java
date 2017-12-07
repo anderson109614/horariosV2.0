@@ -173,7 +173,7 @@ public class entrar extends javax.swing.JFrame {
         if (Character.isLetter(c)) {
             getToolkit().beep();
             evt.consume();
-            JOptionPane.showMessageDialog(null, "Ingrese sólo números");
+            //JOptionPane.showMessageDialog(null, "Ingrese sólo números");
         }// TODO add your handling code here:
     }//GEN-LAST:event_txtUsuarioKeyTyped
 

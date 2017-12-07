@@ -25,6 +25,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -60,14 +61,17 @@ public class Principal extends javax.swing.JFrame {
     DefaultTableModel modeloTabla;
     static String cedula = "";
     static String nom = "";
-
+   
+     static Connection cn=null ;
     public Principal(String ced) {
 
         try {
             initComponents();
+            cc = new Coneccion();
+            cn=  cc.conecct;
             pnlFondo fondo = new pnlFondo(this.getWidth(), this.getHeight());
             this.add(fondo, BorderLayout.CENTER);
-            cc = new Coneccion();
+            
             cc.ArchCedDoce(ced);
             t = new Timer(1000, acciones);
             imageicon = new ImageIcon(this.getClass().getResource("/imagenes/robot.png"));
@@ -89,10 +93,12 @@ public class Principal extends javax.swing.JFrame {
 
         try {
             initComponents();
-            lblNomDoc.setText(colocarNomDocente("1805037619"));
+            
 
             cc = new Coneccion();
+            cn=  cc.conecct;
             cc.ArchCedDoce("1805037619");
+            lblNomDoc.setText(colocarNomDocente("1805037619"));
             t = new Timer(1000, acciones);
             imageicon = new ImageIcon(this.getClass().getResource("/imagenes/robot.png"));
             this.setIconImage(imageicon.getImage());
@@ -106,12 +112,53 @@ public class Principal extends javax.swing.JFrame {
             Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    public Date fecha(){
+        try {
+            
 
+            String sql = "select current_date";
+
+            Statement st = cn.createStatement();
+            ResultSet rs = st.executeQuery(sql);
+
+            while (rs.next()) {
+                return rs.getDate(1);
+
+            }
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
+        return null;
+               
+        
+    }
+    public Time hora(){
+        try {
+           
+
+            String sql = "select current_time";
+
+            Statement st = cn.createStatement();
+            ResultSet rs = st.executeQuery(sql);
+
+            while (rs.next()) {
+                return rs.getTime(1);
+
+            }
+           
+        } catch (SQLException ex) {
+            Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
+        return null;
+               
+        
+    }
     public static String colocarNomDocente(String ced) {
         try {
-            Coneccion cc = new Coneccion();
-            Connection cn = cc.conectar();
-
+            
             String sql = "select nom_doc,ape_doc from docentes where ced_doc='" + cedula + "';";
 
             Statement st = cn.createStatement();
@@ -121,7 +168,7 @@ public class Principal extends javax.swing.JFrame {
                 return rs.getString("nom_doc") + " " + rs.getString("Ape_doc");
 
             }
-            cn.close();
+           
         } catch (SQLException ex) {
             Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
             return "";
@@ -133,14 +180,12 @@ public class Principal extends javax.swing.JFrame {
 
         ArrayList des = new ArrayList();
         try {
-            Coneccion cc = new Coneccion();
-            Connection cn = cc.conectar();
-
+            
             String sql = "select * from recordatorios where fec_rec='" + fecha + "' and ced_doc_per='" + cedula + "' and hor_rec = '" + hora + "' order by hor_rec asc";
 
             Statement st = cn.createStatement();
             ResultSet rs = st.executeQuery(sql);
-            cn.close();
+            
             while (rs.next()) {
                 des.add(rs.getString("des_rec"));
 
@@ -153,18 +198,40 @@ public class Principal extends javax.swing.JFrame {
         return des;
     }
 
-    public static ArrayList JorHoy(String dia, String hora) {
+    public static ArrayList JorHoyIni(String dia, String hora) {
 
         ArrayList des = new ArrayList();
         try {
-            Coneccion cc = new Coneccion();
-            Connection cn = cc.conectar();
+            
 
             String sql = "select * from jornadas where id_dia_per='" + dia + "' and ced_doc_per='" + cedula + "' and hor_emp = '" + hora + "' order by hor_emp asc";
 
             Statement st = cn.createStatement();
             ResultSet rs = st.executeQuery(sql);
-            cn.close();
+            
+            while (rs.next()) {
+                des.add(rs.getString("des_jor"));
+
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
+
+        }
+
+        return des;
+    }
+    
+    public static ArrayList JorHoyFin(String dia, String hora) {
+
+        ArrayList des = new ArrayList();
+        try {
+            
+
+            String sql = "select * from jornadas where id_dia_per='" + dia + "' and ced_doc_per='" + cedula + "' and hor_ter = '" + hora + "' order by hor_emp asc";
+
+            Statement st = cn.createStatement();
+            ResultSet rs = st.executeQuery(sql);
+            
             while (rs.next()) {
                 des.add(rs.getString("des_jor"));
 
@@ -200,7 +267,7 @@ public class Principal extends javax.swing.JFrame {
         tblRecordatorio.setModel(modeloTabla);
         SimpleDateFormat parseador = new SimpleDateFormat("dd-MM-yyyy");
         SimpleDateFormat parseador2 = new SimpleDateFormat("H:mm");
-        Connection cn = cc.conectar();
+        
         Calendar fecha = Calendar.getInstance();
         String sql = "select * from recordatorios where fec_rec ='" + parseador.format(fecha.getTime()) + "' and ced_doc_per = '" + cedula + "' and hor_rec >= '" + parseador2.format(fecha.getTime()) + "' order by hor_rec asc";
         try {
@@ -252,14 +319,18 @@ public class Principal extends javax.swing.JFrame {
             ///
 
             ///////Aqui poner todo lo que se va a estar repitiento cada 5 segundos
-            SimpleDateFormat formateador = new SimpleDateFormat(" dd-MM-yyyy");
+            Date fecha = fecha();
+            Time hora = hora();
+//            SimpleDateFormat formateador = new SimpleDateFormat(" dd-MM-yyyy");
+            //System.out.println(hora);
+//           Calendar cal = Calendar.getInstance();
             
-            Calendar cal = Calendar.getInstance();
-            lblReloj.setText(formateador.format(cal.getTime()));
             SimpleDateFormat formateador2 = new SimpleDateFormat("dd-MM-yyyy");
-            SimpleDateFormat formateador3 = new SimpleDateFormat("H:mm:ss");
-            String fec = formateador2.format(cal.getTime());
-            String hor = formateador3.format(cal.getTime());
+            SimpleDateFormat formateador3 = new SimpleDateFormat("HH:mm:ss");
+            String fec = formateador2.format(fecha);
+            String hor = formateador3.format(hora.getTime());
+            
+            lblReloj.setText(hor);
             lblfecha.setText(fec);
             ArrayList des = recHoy(fec, hor);
 
@@ -274,23 +345,34 @@ public class Principal extends javax.swing.JFrame {
 
             }
 
-            SimpleDateFormat formateadorM = new SimpleDateFormat("mm");
-            String minExt = formateadorM.format(cal.getTime()); 
-            if (minExt == "00") {
+            SimpleDateFormat formateadorM = new SimpleDateFormat("mm:ss");
+            String minExt = formateadorM.format(hora); 
+            if (minExt.equals("00:00")) {
                 SimpleDateFormat formateadorH = new SimpleDateFormat("HH");
-                String horExt = formateadorH.format(cal.getTime());
+                String horExt = formateadorH.format(hora);
                 System.out.println(horExt);
-                String dia = String.valueOf(cal.get(Calendar.DAY_OF_WEEK) - 1);
+                String dia = String.valueOf(fecha.getDay());
 
-                ArrayList desJor = JorHoy(dia, horExt + ":00:00");
+                ArrayList desJorIni = JorHoyIni(dia, horExt + ":00:00");
+                ArrayList desJorFin = JorHoyFin(dia, horExt + ":00:00");
+                if (desJorIni.size() > 0) {
+                    for (int i = 0; i < desJorIni.size(); i++) {
+                        sonido();
+                        sonido();
+                        sonido();
+                        sonido();
+                        JOptionPane.showMessageDialog(null, "Inicio de Jornada: " + desJorIni.get(i));
+                    }
 
-                if (desJor.size() > 0) {
-                    for (int i = 0; i < desJor.size(); i++) {
+                }
+                
+                if (desJorFin.size() > 0) {
+                    for (int i = 0; i < desJorFin.size(); i++) {
                         sonido();
                         sonido();
                         sonido();
                         sonido();
-                        JOptionPane.showMessageDialog(null, "Recuerde: " + desJor.get(i));
+                        JOptionPane.showMessageDialog(null, "Fin de Jornada: " + desJorFin.get(i));
                     }
 
                 }
@@ -361,10 +443,8 @@ public class Principal extends javax.swing.JFrame {
         });
 
         lblReloj.setFont(new java.awt.Font("Tahoma", 1, 36)); // NOI18N
-        lblReloj.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
         lblNomDoc.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        lblNomDoc.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
         tblRecordatorio.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -385,8 +465,8 @@ public class Principal extends javax.swing.JFrame {
         jLabel2.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel2.setText("Usuario:");
 
-        lblfecha.setText(" ");
-        lblfecha.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        lblfecha.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        lblfecha.setText("fecha");
 
         jLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/alarm-clock.png"))); // NOI18N
         jLabel3.setText(" ");
@@ -471,16 +551,19 @@ public class Principal extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGap(33, 33, 33)
+                        .addComponent(jLabel3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 27, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblfecha, javax.swing.GroupLayout.PREFERRED_SIZE, 234, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lblReloj, javax.swing.GroupLayout.PREFERRED_SIZE, 234, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addComponent(lblReloj, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(lblfecha, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(42, 42, 42))))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(12, 12, 12)
@@ -511,18 +594,18 @@ public class Principal extends javax.swing.JFrame {
                         .addGap(4, 4, 4)
                         .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jLabel3)
-                            .addComponent(lblReloj, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblReloj, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(lblfecha, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(lblfecha))
                             .addGroup(layout.createSequentialGroup()
-                                .addGap(31, 31, 31)
-                                .addComponent(jLabel1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                .addGap(17, 17, 17)
+                                .addComponent(jLabel3)))
+                        .addGap(18, 18, Short.MAX_VALUE)
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(21, 21, 21))
         );
 
@@ -628,7 +711,7 @@ public class Principal extends javax.swing.JFrame {
             this.dispose();
             registrar reg = new registrar();
             reg.setVisible(true);
-
+           // cn.close();
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
         }
