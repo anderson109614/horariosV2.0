@@ -18,6 +18,8 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
 import javax.swing.JOptionPane;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -72,10 +74,101 @@ public class Horarios extends javax.swing.JDialog {
 //
 //        }
 //    }
+    public boolean Act_tabla(int col, int fil) {
+         cc = new Coneccion();
+        Connection cn = cc.conectar();
+        String sql = "";
+//        if (col == 1) {
+//
+//            sql = "UPDATE JORNADAS SET AUT_MARCA='" + tblHorario.getValueAt(fil, col) + "' "
+//                    + "WHERE AUT_PLACA='" + tblHorario.getValueAt(fil, 0) + "'";
+//
+//        }
+     boolean aux = false;
+        if (col == 2) {
+            if(validarHoraFinMayorHoraIniTabla(fil) && validarHorasJornadaTabla(fil,tblHorario.getValueAt(fil, 0).toString())){
+            String h=tblHorario.getValueAt(fil, col).toString().substring(0, 2);
+            String ax=h.substring(1);
+            if(ax.equals(":")){
+                h="0"+h.charAt(0)+":00:00";
+            }else{
+                h=h+":00:00";
+            }
+                sql = "UPDATE JORNADAS SET HOR_EMP='" + h + "' "
+                    + "WHERE ID_JOR='" + tblHorario.getValueAt(fil, 0) + "'";
+            aux=true;
+            }
+        }
+        if (col == 3) {
+            if(validarHoraFinMayorHoraIniTabla(fil) && validarHorasJornadaTabla(fil,tblHorario.getValueAt(fil, 0).toString())){
+            String h=tblHorario.getValueAt(fil, col).toString().substring(0, 2);
+            String ax=h.substring(1);
+            if(ax.equals(":")){
+                h="0"+h.charAt(0)+":00:00";
+            }else{
+                h=h+":00:00";
+            }
+                sql = "UPDATE JORNADAS SET HOR_TER='" + h + "' "
+                    + "WHERE ID_JOR='" + tblHorario.getValueAt(fil, 0) + "'";
+            aux=true;
+            }
+        }
+        if (col == 4) {
+
+            sql = "UPDATE JORNADAS SET DES_JOR='" + tblHorario.getValueAt(fil, col) + "' "
+                    + "WHERE ID_JOR='" + tblHorario.getValueAt(fil, 0) + "'";
+            aux=true;
+        }
+         
+        try {
+           if(aux){
+            PreparedStatement psd = cn.prepareStatement(sql);
+            psd.executeUpdate();
+            return true;   
+           }else{
+               return false;
+           }
+            
+        } catch (SQLException ex) {
+            return false;
+        }
+
+    }
+
     public boolean validarHoraFinMayorHoraIni() {
         try {
             int horaIni = Integer.valueOf(spnHoraIni.getValue().toString());
             int horaFin = Integer.valueOf(spnHoraFin.getValue().toString());
+            if (horaIni >= horaFin) {
+                JOptionPane.showMessageDialog(null, "Error: hora fin debe ser mayor a hora inicio");
+                return false;
+            }
+            return true;
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, "Error de fecha: " + ex);
+            return false;
+        }
+
+    }
+    public boolean validarHoraFinMayorHoraIniTabla(int row) {
+        try {
+            String h=tblHorario.getValueAt(row, 2).toString().substring(0, 2);
+            String ax=h.substring(1);
+            String h1=tblHorario.getValueAt(row, 3).toString().substring(0, 2);
+            String ax1=h1.substring(1);
+            if(ax.equals(":")){
+                h="0"+h.charAt(0) ;
+            }else{
+                h=h  ;
+            }
+            if(ax1.equals(":")){
+                h1="0"+h1.charAt(0) ;
+            }else{
+                h1=h1 ;
+            }
+            int horaIni = Integer.valueOf(h);
+            int horaFin = Integer.valueOf(h1);
+           // System.out.println(horaIni+" "+horaFin);
             if (horaIni >= horaFin) {
                 JOptionPane.showMessageDialog(null, "Error: hora fin debe ser mayor a hora inicio");
                 return false;
@@ -121,6 +214,89 @@ public class Horarios extends javax.swing.JDialog {
             String sql = "select * from jornadas "
                     + "where id_dia_per =" + (cmbDias.getSelectedIndex() + 1) + " "
                     + "and ced_doc_per ='" + cedDoc + "'";
+            try {
+                Statement st = cn.createStatement();
+                ResultSet rs = st.executeQuery(sql);
+                while (rs.next()) {
+                    hib = parseador.parse(rs.getString("hor_emp"));
+                    horaIniBase.setTime(hib);
+                    inicioB = horaIniBase.get(Calendar.HOUR_OF_DAY);
+
+                    hfb = parseador.parse(rs.getString("hor_ter"));
+                    horaFinBase.setTime(hfb);
+                    finB = horaFinBase.get(Calendar.HOUR_OF_DAY);
+
+                    numH = finB - inicioB;
+
+                    inicio = horaIni.get(Calendar.HOUR_OF_DAY);
+                    for (int i = 0; i < numH; i++) {
+                        if (inicioB == inicio) {
+                            JOptionPane.showMessageDialog(null, "Error: jornada se cruza con otra asignada");
+                            return false;
+                        }
+                        inicioB++;
+                    }
+                }
+                return true;
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(null, "Error base: " + ex);
+                return false;
+            }
+
+        } catch (ParseException ex) {
+            JOptionPane.showMessageDialog(null, "Error en las fechas: " + ex);
+            return false;
+        }
+    }
+    
+    public boolean validarHorasJornadaTabla(int row,String jor) {
+
+        try {
+            String h=tblHorario.getValueAt(row, 2).toString().substring(0, 2);
+            String ax=h.substring(1);
+            String h1=tblHorario.getValueAt(row, 3).toString().substring(0, 2);
+            String ax1=h1.substring(1);
+            if(ax.equals(":")){
+                h="0"+h.charAt(0) ;
+            }else{
+                h=h;
+            }
+            if(ax1.equals(":")){
+                h1="0"+h1.charAt(0);
+            }else{
+                h1=h1;
+            }
+            String horaI = (h);
+            String horaF = (h1);
+            SimpleDateFormat parseador = new SimpleDateFormat("H:mm");
+            //SimpleDateFormat formateador = new SimpleDateFormat("H:mm");
+            //Hora Inicio
+            Calendar horaIni = Calendar.getInstance();
+            Date hi = parseador.parse(horaI + ":00");
+            horaIni.setTime(hi);
+            //Hora fin
+            Calendar horafin = Calendar.getInstance();
+            Date hf = parseador.parse(horaF + ":00");
+            horafin.setTime(hf);
+            //Hora inicio recuperada base
+            Calendar horaIniBase = Calendar.getInstance();
+            Date hib = null;
+
+            //Hora fin recuperada base
+            Calendar horaFinBase = Calendar.getInstance();
+            Date hfb = null;
+
+            int inicio, inicioB, finB, numH;
+            inicio = 0;
+            inicioB = 0;
+            finB = 0;
+            numH = 0;
+
+            Connection cn = cc.conectar();
+            String sql = "select * from jornadas "
+                    + "where id_dia_per =" + (cmbDias.getSelectedIndex() + 1) + " "
+                    + "and ced_doc_per ='" + cedDoc + "' "
+                    + "and id_jor <> '"+jor+"'";
             try {
                 Statement st = cn.createStatement();
                 ResultSet rs = st.executeQuery(sql);
@@ -261,12 +437,16 @@ public class Horarios extends javax.swing.JDialog {
     }
 
     public void modeloDeTabla() {
-        String titulos[] = {"Dia", "Hora Inicio", "Hora Fin", "Descripción"};
+        String titulos[] = {"ID","Dia", "Hora Inicio", "Hora Fin", "Descripción"};
         modeloTabla = new DefaultTableModel(null, titulos) {
 
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false;
+                if (column == 0 && column==1) {
+                    return false;
+                }
+                return true;
+            
             }
         };
         tblHorario.setModel(modeloTabla);
@@ -276,7 +456,7 @@ public class Horarios extends javax.swing.JDialog {
             Coneccion cc = new Coneccion();
             Connection cn = cc.conectar();
 
-            String sql = "select j.hor_emp,j.hor_ter,j.des_jor,d.nom_dia\n"
+            String sql = "select J.ID_JOR,j.hor_emp,j.hor_ter,j.des_jor,d.nom_dia\n"
                     + "from jornadas j, dias d\n"
                     + "where j.ced_doc_per='" + cedDoc + "'\n"
                     + "and j.id_dia_per=d.id_dia\n"
@@ -284,14 +464,30 @@ public class Horarios extends javax.swing.JDialog {
                     + " order by hor_emp asc;";
             Statement st = cn.createStatement();
             ResultSet rs = st.executeQuery(sql);
-            String fila[] = new String[4];
+            String fila[] = new String[5];
             while (rs.next()) {
-                fila[0] = rs.getString(4);
-                fila[1] = rs.getString(1);
+                fila[0] = rs.getString(1);
+                fila[1] = rs.getString(5);
                 fila[2] = rs.getString(2);
                 fila[3] = rs.getString(3);
+                fila[4] = rs.getString(4);
                 modeloTabla.addRow(fila);
             }
+            modeloTabla.addTableModelListener(new TableModelListener() {
+                @Override
+                public void tableChanged(TableModelEvent e) {// guardado de la iformacion directo del jtable
+                    if (e.getType() == TableModelEvent.UPDATE) {
+                        int columna = e.getColumn();
+                        int fila = e.getFirstRow();
+                        if (Act_tabla(columna, fila)) {
+                            
+                            JOptionPane.showMessageDialog(null, "Actualizacion correcta");
+                        }
+                        modeloDeTabla();
+
+                    }
+                }
+            });
             cn.close();
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, "Error de base: " + ex);
@@ -399,6 +595,7 @@ public class Horarios extends javax.swing.JDialog {
 
         spnHoraIni.setModel(new javax.swing.SpinnerNumberModel(7, 7, 20, 1));
 
+        btnAgregar.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         btnAgregar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/guardar.png"))); // NOI18N
         btnAgregar.setText("Guardar");
         btnAgregar.addActionListener(new java.awt.event.ActionListener() {
@@ -407,6 +604,7 @@ public class Horarios extends javax.swing.JDialog {
             }
         });
 
+        btnLimpiar.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         btnLimpiar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/cancelar.png"))); // NOI18N
         btnLimpiar.setText("Cancelar");
         btnLimpiar.addActionListener(new java.awt.event.ActionListener() {
@@ -429,6 +627,7 @@ public class Horarios extends javax.swing.JDialog {
             }
         });
 
+        jButton1.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/salir.png"))); // NOI18N
         jButton1.setText("Salir");
         jButton1.setHorizontalAlignment(javax.swing.SwingConstants.LEADING);
@@ -456,7 +655,7 @@ public class Horarios extends javax.swing.JDialog {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(39, 39, 39)
+                .addGap(34, 34, 34)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
@@ -476,18 +675,18 @@ public class Horarios extends javax.swing.JDialog {
                                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                         .addComponent(spnHoraFin, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addComponent(spnHoraIni, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addComponent(cmbDias, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 44, Short.MAX_VALUE)
+                                    .addComponent(cmbDias, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 43, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(btnLimpiar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(btnAgregar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addGap(34, 34, 34))
+                            .addComponent(jButton1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addGap(39, 39, 39))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(27, 27, 27)
+                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -507,13 +706,14 @@ public class Horarios extends javax.swing.JDialog {
                             .addComponent(txtDescripcion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btnAgregar)
-                        .addGap(18, 18, 18)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnLimpiar)
-                        .addGap(18, 18, 18)
-                        .addComponent(jButton1)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton1)
+                        .addGap(24, 24, 24)))
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(23, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
