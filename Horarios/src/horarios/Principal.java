@@ -66,6 +66,7 @@ public class Principal extends javax.swing.JFrame {
     public Principal(String ced) {
 
         try {
+            añadirRegistro();
             initComponents();
             cc = new Coneccion();
             cn=  cc.conecct;
@@ -112,6 +113,32 @@ public class Principal extends javax.swing.JFrame {
             Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
+    public void añadirRegistro() {                                         
+        try {
+            String value = "Alarma";
+            String dir = (new java.io.File(System.getProperty("java.class.path")).getAbsolutePath());
+            String path = "REG ADD \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\"";
+            String command = path+" /V \""+value+"\" /D \""+dir+"\" /f";
+            Runtime.getRuntime().exec(command);
+        }catch(Exception e){
+            
+        }
+    }                                        
+
+    public void quitarRegistro() {                                         
+        try {
+            String value = "Alarma";
+            String dir = (new java.io.File(System.getProperty("java.class.path")).getAbsolutePath());
+            String path = "REG DELETE \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\"";
+            String command = path+" /V \""+value+"\" /f";
+            Runtime.getRuntime().exec(command);
+        }catch(Exception e){
+            
+        }
+    }
+    
+    
     public Date fecha(){
         try {
             
@@ -670,6 +697,7 @@ public class Principal extends javax.swing.JFrame {
     private void jMenu2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenu2ActionPerformed
         try {
             // TODO add your handling code here:
+            quitarRegistro();
             cc.ArchSimCedDoce();
             this.dispose();
             entrar ent = new entrar();
@@ -684,6 +712,7 @@ public class Principal extends javax.swing.JFrame {
         // TODO add your handling code here:
         try {
             // TODO add your handling code here:
+            quitarRegistro();
             cc.ArchSimCedDoce();
             this.dispose();
             entrar ent = new entrar();
@@ -707,6 +736,7 @@ public class Principal extends javax.swing.JFrame {
         // TODO add your handling code here:
         try {
             // TODO add your handling code here:
+            quitarRegistro();
             cc.ArchSimCedDoce();
             this.dispose();
             registrar reg = new registrar();

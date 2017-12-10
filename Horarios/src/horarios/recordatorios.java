@@ -6,6 +6,8 @@
 package horarios;
 
 import java.awt.BorderLayout;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -17,6 +19,9 @@ import java.util.Calendar;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -31,6 +36,7 @@ public class recordatorios extends javax.swing.JDialog {
     Coneccion cc = new Coneccion();
     String cedDoc = "";
     DefaultTableModel modeloTabla;
+    int pv;
 
     public recordatorios() {
         initComponents();
@@ -47,7 +53,7 @@ public class recordatorios extends javax.swing.JDialog {
     public recordatorios(java.awt.Frame parent, boolean modal,String cedula) {
         super(parent,modal);
         initComponents();
-        
+        EliminarSprm(tblRecordatorio);
         cedDoc = cedula;
         cargarDatosTabla();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -212,7 +218,7 @@ public class recordatorios extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     public void cargarDatosTabla() {
-        String titulos[] = {"FECHA", "HORA", "DESCRIPCIÓN"};
+        String titulos[] = {"ID","FECHA", "HORA", "DESCRIPCIÓN"};
         modeloTabla = new DefaultTableModel(null, titulos) {
 
             @Override
@@ -231,11 +237,12 @@ public class recordatorios extends javax.swing.JDialog {
         try {
             Statement st = cn.createStatement();
             ResultSet rs = st.executeQuery(sql);
-            String fila[] = new String[3];
+            String fila[] = new String[4];
             while (rs.next()) {
-                fila[0] = rs.getString("fec_rec");
-                fila[1] = rs.getString("hor_rec");
-                fila[2] = rs.getString("des_rec");
+                fila[0] = rs.getString("id_rec");
+                fila[1] = rs.getString("fec_rec");
+                fila[2] = rs.getString("hor_rec");
+                fila[3] = rs.getString("des_rec");
                 modeloTabla.addRow(fila);
             }
             cn.close();
@@ -243,6 +250,40 @@ public class recordatorios extends javax.swing.JDialog {
             JOptionPane.showMessageDialog(null, "Error de base: " + ex);
         }
 
+    }
+    
+    public void EliminarSprm(JTable a) {
+        a.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent lse) {
+                pv=1;
+                a.addKeyListener(new KeyAdapter() {
+                    public void keyPressed(KeyEvent e) {
+                        if (a.getSelectedRow() != -1 && pv==1) {
+                            pv++;
+                            int fila = a.getSelectedRow();
+                            if (e.getKeyChar() == KeyEvent.VK_DELETE) {
+                                cc = new Coneccion();
+                                Connection cn = cc.conectar();
+                                String sql = "";
+                                sql = "delete from recordatorios where id_rec='" + a.getValueAt(fila, 0).toString() + "'";
+                                int opc = JOptionPane.showConfirmDialog(null, "¿Desea Eliminar?");
+                                if (opc == 0) {
+                                    try {
+                                        PreparedStatement pst;
+                                        pst = cn.prepareStatement(sql);
+                                        pst.executeUpdate();
+                                        cargarDatosTabla();
+                                    } catch (SQLException ex) {
+                                        JOptionPane.showMessageDialog(null, ex);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        });
     }
 
     private void btnLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarActionPerformed

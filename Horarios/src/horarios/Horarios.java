@@ -6,6 +6,7 @@ package horarios;
 
 import java.awt.BorderLayout;
 import java.awt.HeadlessException;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.sql.*;
 import java.text.ParseException;
@@ -18,6 +19,9 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
@@ -35,10 +39,12 @@ public class Horarios extends javax.swing.JDialog {
     DefaultComboBoxModel modeloComboBox;
     Coneccion cc;
     String cedDoc;
+    int pv;
 
     public Horarios(java.awt.Frame parent, boolean modal,String cedula) {
         super(parent,modal);
         initComponents();
+        EliminarSprm(tblHorario);
         cc = new Coneccion();
         cargarComboBoxDias();
         cedDoc = cedula;
@@ -133,6 +139,40 @@ public class Horarios extends javax.swing.JDialog {
             return false;
         }
 
+    }
+    
+    public void EliminarSprm(JTable a) {
+        a.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent lse) {
+                pv=1;
+                a.addKeyListener(new KeyAdapter() {
+                    public void keyPressed(KeyEvent e) {
+                        if (a.getSelectedRow() != -1 && pv==1) {
+                            pv++;
+                            int fila = a.getSelectedRow();
+                            if (e.getKeyChar() == KeyEvent.VK_DELETE) {
+                                cc = new Coneccion();
+                                Connection cn = cc.conectar();
+                                String sql = "";
+                                sql = "delete from jornadas where id_jor='" + a.getValueAt(fila, 0).toString() + "'";
+                                int opc = JOptionPane.showConfirmDialog(null, "¿Desea Eliminar?");
+                                if (opc == 0) {
+                                    try {
+                                        PreparedStatement pst;
+                                        pst = cn.prepareStatement(sql);
+                                        pst.executeUpdate();
+                                        modeloDeTabla();
+                                    } catch (SQLException ex) {
+                                        JOptionPane.showMessageDialog(null, ex);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        });
     }
 
     public boolean validarHoraFinMayorHoraIni() {
@@ -711,9 +751,9 @@ public class Horarios extends javax.swing.JDialog {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton1)
                         .addGap(24, 24, 24)))
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(18, Short.MAX_VALUE))
         );
 
         pack();

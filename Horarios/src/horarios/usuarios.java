@@ -29,12 +29,12 @@ public class usuarios extends javax.swing.JDialog {
      * Creates new form usuarios
      */
     public usuarios(java.awt.Frame parent, boolean modal) {
-        super(parent,modal);
+        super(parent, modal);
         initComponents();
         pnlFondo fondo = new pnlFondo(this.getWidth(), this.getHeight());
         this.add(fondo, BorderLayout.CENTER);
         this.setLocationRelativeTo(null);
-        
+
     }
 //        cargarTablaUsuarios("");
 //        
@@ -58,6 +58,7 @@ public class usuarios extends javax.swing.JDialog {
 //        });
 //        this.setLocationRelativeTo(null);
 //    }
+
     public usuarios() {
         initComponents();
         pnlFondo fondo = new pnlFondo(this.getWidth(), this.getHeight());
@@ -65,8 +66,7 @@ public class usuarios extends javax.swing.JDialog {
         this.setLocationRelativeTo(null);
     }
 //        cargarTablaUsuarios("");
-        
-        
+
 //        tblUsuarios.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 //            @Override
 //            public void valueChanged(ListSelectionEvent lse) {
@@ -86,7 +86,6 @@ public class usuarios extends javax.swing.JDialog {
 //        });
 //    }
 //    DefaultTableModel model;
-
 //    public void cargarTablaUsuarios(String Dato) {
 //
 //        String[] titulos = {"CEDULA", "NOMBRE", "APELLIDO","CLAVE"};
@@ -119,9 +118,8 @@ public class usuarios extends javax.swing.JDialog {
 //            JOptionPane.showMessageDialog(null, ex);
 //        }
 //    }
-
     public void guardar() {
-        if (txtCedula.getText().isEmpty() || verificarCedula(txtCedula.getText())==0) {
+        if (txtCedula.getText().isEmpty() || verificarCedula(txtCedula.getText()) == 0) {
             JOptionPane.showMessageDialog(null, "Debe ingresar cédula válida");
             txtCedula.requestFocus();
         } else if (txtNombre.getText().isEmpty()) {
@@ -140,11 +138,11 @@ public class usuarios extends javax.swing.JDialog {
             CED_DOC = txtCedula.getText().trim().toUpperCase();
             NOM_DOC = txtNombre.getText().trim().toUpperCase();
             APE_DOC = txtApellido.getText().trim().toUpperCase();
-            String contraseña= txtComtraseña.getText();
+            String contraseña = txtComtraseña.getText();
             //Emcriptado
-            
+
             PAS_DOC = DigestUtils.md5Hex(txtComtraseña.getText().trim());
-            
+
             ///////
             if (contraseña.equals(txtContraseñaCon.getText())) {
                 //jPasswordField2.getText( ).trim();
@@ -162,6 +160,9 @@ public class usuarios extends javax.swing.JDialog {
 
                     if (n > 0) {
                         JOptionPane.showMessageDialog(null, "Se insertó la información correctamente");
+                        this.dispose();
+                        Principal pri = new Principal(txtCedula.getText());
+                        pri.setVisible(true);
 //                        cargarTablaUsuarios("");
                         txtLimpiar();
                     }
@@ -186,8 +187,6 @@ public class usuarios extends javax.swing.JDialog {
         txtContraseñaCon.setText("");
     }
 
-    
-
     public void txtDesBloqueo() {
         txtCedula.setEnabled(true);
         txtNombre.setEnabled(true);
@@ -198,11 +197,11 @@ public class usuarios extends javax.swing.JDialog {
     }
 
     public void BotonesInicio() {
-     
+
         btnAgregar.setEnabled(false);
-   
+
         btnLimpiar.setEnabled(false);
- 
+
         btnSalir.setEnabled(true);
     }
 
@@ -212,10 +211,7 @@ public class usuarios extends javax.swing.JDialog {
         btnSalir.setEnabled(true);
     }
 
-    
-
-    
-    public static int verificarCedula(String ced) { 
+    public static int verificarCedula(String ced) {
         int par, impar, tot, x, dv, z;
         par = 0;
         impar = 0;
@@ -249,7 +245,6 @@ public class usuarios extends javax.swing.JDialog {
             return 0;
         }
     }
-    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -416,31 +411,31 @@ public class usuarios extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void txtNombreKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtNombreKeyTyped
-         char c=evt.getKeyChar();  
-         if(Character.isDigit(c)) { 
-              getToolkit().beep(); 
-              evt.consume(); 
-              
-         }  
+        char c = evt.getKeyChar();
+        if (Character.isDigit(c)) {
+            getToolkit().beep();
+            evt.consume();
+
+        }
     }//GEN-LAST:event_txtNombreKeyTyped
 
     private void txtApellidoKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtApellidoKeyTyped
-        char c=evt.getKeyChar();  
-         if(Character.isDigit(c)) { 
-              getToolkit().beep(); 
-              evt.consume(); 
-              
-         }              // TODO add your handling code here:
+        char c = evt.getKeyChar();
+        if (Character.isDigit(c)) {
+            getToolkit().beep();
+            evt.consume();
+
+        }              // TODO add your handling code here:
     }//GEN-LAST:event_txtApellidoKeyTyped
 
     private void txtCedulaKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCedulaKeyTyped
-         if (txtCedula.getText().length() > 10) {
+        if (txtCedula.getText().length() > 10) {
             if (!Character.isDigit(evt.getKeyChar())) {
                 getToolkit().beep();
                 evt.consume();
             }
         }
-        
+
 //        char c=evt.getKeyChar();  
 //        if(Character.isLetter(c)) { 
 //              getToolkit().beep(); 
@@ -456,8 +451,7 @@ public class usuarios extends javax.swing.JDialog {
     private void btnAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarActionPerformed
         guardar();
         txtLimpiar();
-        Principal pri= new Principal(Principal.cedula);
-        pri.setVisible(true);
+
     }//GEN-LAST:event_btnAgregarActionPerformed
 
     private void btnLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarActionPerformed
@@ -468,18 +462,14 @@ public class usuarios extends javax.swing.JDialog {
 
     private void btnSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalirActionPerformed
         this.dispose();
-        registrar reg=new registrar();
+        registrar reg = new registrar();
         reg.setVisible(true);        // TODO add your handling code here:
-         
+
     }//GEN-LAST:event_btnSalirActionPerformed
-     
-             
-             
-             
+
     /**
      * @param args the command line arguments
      */
-    
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
