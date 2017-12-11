@@ -465,10 +465,10 @@ public class usuarios extends javax.swing.JDialog {
 
     private void btnSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalirActionPerformed
         this.dispose();
-        if (registrado) {
-            registrar reg = new registrar();
-            reg.setVisible(true);        // TODO add your handling code here:
-        }
+
+        registrar reg = new registrar();
+        reg.setVisible(true);        // TODO add your handling code here:
+
     }//GEN-LAST:event_btnSalirActionPerformed
 
     /**
