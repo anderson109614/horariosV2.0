@@ -1,1 +1,1 @@
-localhost::postgres::1234::horarios::false
+localhost::UsuarioPro::proyecto::horarios::false

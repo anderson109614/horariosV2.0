@@ -5,6 +5,7 @@
  */
 package horarios;
 
+import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -44,11 +45,15 @@ public class Coneccion {
         try {
             Class.forName("org.postgresql.Driver");
             conecct = DriverManager.getConnection("jdbc:postgresql://" + ip + ":5432/" + nomBD, userBD, passBD);
-
+            Principal.jLabelEstadoConecion.setText("Conectado");
+            Principal.jLabelEstadoConecion.setForeground(Color.green);
 //JOptionPane.showMessageDialog(null, "Conexxion Exitosa");
         } catch (Exception ex) {
             //JOptionPane.showMessageDialog(null, ex);
-            JOptionPane.showMessageDialog(null, "Error en la conexión"+ex);
+            //JOptionPane.showMessageDialog(null, "Error en la conexión"+ex);
+            Principal.jLabelEstadoConecion.setText("Desconectado");
+            Principal.jLabelEstadoConecion.setForeground(Color.RED);
+            conectar();
         }
         return conecct;
 
