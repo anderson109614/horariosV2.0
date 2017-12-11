@@ -28,6 +28,8 @@ public class usuarios extends javax.swing.JDialog {
     /**
      * Creates new form usuarios
      */
+    boolean registrado = false;
+
     public usuarios(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
@@ -160,6 +162,7 @@ public class usuarios extends javax.swing.JDialog {
 
                     if (n > 0) {
                         JOptionPane.showMessageDialog(null, "Se insertó la información correctamente");
+                        registrado = true;
                         this.dispose();
                         Principal pri = new Principal(txtCedula.getText());
                         pri.setVisible(true);
@@ -462,19 +465,24 @@ public class usuarios extends javax.swing.JDialog {
 
     private void btnSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalirActionPerformed
         this.dispose();
-        registrar reg = new registrar();
-        reg.setVisible(true);        // TODO add your handling code here:
-
+        if (registrado) {
+            registrar reg = new registrar();
+            reg.setVisible(true);        // TODO add your handling code here:
+        }
     }//GEN-LAST:event_btnSalirActionPerformed
 
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
+        /*
+         * Set the Nimbus look and feel
+         */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+        /*
+         * If Nimbus (introduced in Java SE 6) is not available, stay with the
+         * default look and feel. For details see
+         * http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
@@ -497,14 +505,16 @@ public class usuarios extends javax.swing.JDialog {
         //</editor-fold>
         //</editor-fold>
 
-        /* Create and display the form */
+        /*
+         * Create and display the form
+         */
         java.awt.EventQueue.invokeLater(new Runnable() {
+
             public void run() {
                 new usuarios().setVisible(true);
             }
         });
     }
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAgregar;
     private javax.swing.JButton btnLimpiar;

@@ -307,8 +307,7 @@ public class recordatorios extends javax.swing.JDialog {
             SimpleDateFormat formateador = new SimpleDateFormat("H:mm");
             //Hora Inicio
             Calendar fa = Calendar.getInstance();
-            Calendar fechaActual = Calendar.getInstance();
-            fa.setTime(parseador.parse(parseador.format(fechaActual.getTime())));
+            fa.setTime(Principal.fecha());
             Calendar fecha = Calendar.getInstance();
             fecha.setTime(parseador.parse(fechaRecordatorio.getText()));
             //Hora inicio recuperada base

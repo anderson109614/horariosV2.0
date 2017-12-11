@@ -139,7 +139,7 @@ public class Principal extends javax.swing.JFrame {
     }
     
     
-    public Date fecha(){
+    public static Date fecha(){
         try {
             
 
