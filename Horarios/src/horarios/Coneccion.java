@@ -53,12 +53,20 @@ public class Coneccion {
             //JOptionPane.showMessageDialog(null, "Error en la conexión"+ex);
             Principal.jLabelEstadoConecion.setText("Desconectado");
             Principal.jLabelEstadoConecion.setForeground(Color.RED);
+            System.out.println(ex);
+            esperar(20);
             conectar();
         }
         return conecct;
 
     }
-
+public static void esperar(int segundos) {
+        try {
+            Thread.sleep(segundos * 1000);
+        } catch (Exception e) {
+            System.out.println("falla de tiempo");// Mensaje en caso de que falle
+        }
+    }
     public void datos() {
         File f = new File("conf.txt");
         String[] datosL = null;

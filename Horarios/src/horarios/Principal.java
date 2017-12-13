@@ -9,6 +9,7 @@ import static horarios.reproducir.getSound;
 import java.awt.AWTException;
 import java.awt.BorderLayout;
 import java.awt.Graphics;
+import java.awt.HeadlessException;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
@@ -57,22 +58,23 @@ public class Principal extends javax.swing.JFrame {
     private ImageIcon imageicon;
     private TrayIcon trayicon;
     private SystemTray systemtray;
-    Coneccion cc;
+    static Coneccion cc;
     DefaultTableModel modeloTabla;
     static String cedula = "";
     static String nom = "";
-   
-     static Connection cn=null ;
+
+    static Connection cn = null;
+
     public Principal(String ced) {
 
         try {
-            añadirRegistro();
+
             initComponents();
             cc = new Coneccion();
-            cn=  cc.conecct;
+            cn = cc.conecct;
             pnlFondo fondo = new pnlFondo(this.getWidth(), this.getHeight());
             this.add(fondo, BorderLayout.CENTER);
-            
+
             cc.ArchCedDoce(ced);
             t = new Timer(1000, acciones);
             imageicon = new ImageIcon(this.getClass().getResource("/imagenes/robot.png"));
@@ -86,7 +88,8 @@ public class Principal extends javax.swing.JFrame {
             lblNomDoc.setText(colocarNomDocente(ced));
 
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("constructor: ");
+            cc.conectar();
         }
     }
 
@@ -94,10 +97,9 @@ public class Principal extends javax.swing.JFrame {
 
         try {
             initComponents();
-            
 
             cc = new Coneccion();
-            cn=  cc.conecct;
+            cn = cc.conecct;
             //cc.ArchCedDoce("1805037619");
             pnlFondo fondo = new pnlFondo(this.getWidth(), this.getHeight());
             this.add(fondo, BorderLayout.CENTER);
@@ -112,39 +114,14 @@ public class Principal extends javax.swing.JFrame {
             cedula = "1805037619";
 
         } catch (Exception ex) {
-            Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("constructor");
+            cc.conectar();
         }
     }
-    
-    public void añadirRegistro() {                                         
-        try {
-            String value = "Alarma";
-            String dir = (new java.io.File(System.getProperty("java.class.path")).getAbsolutePath());
-            String path = "REG ADD \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\"";
-            String command = path+" /V \""+value+"\" /D \""+dir+"\" /f";
-            Runtime.getRuntime().exec(command);
-        }catch(Exception e){
-            
-        }
-    }                                        
 
-    public void quitarRegistro() {                                         
+    public static Date fecha() {
         try {
-            String value = "Alarma";
-            String dir = (new java.io.File(System.getProperty("java.class.path")).getAbsolutePath());
-            String path = "REG DELETE \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\"";
-            String command = path+" /V \""+value+"\" /f";
-            Runtime.getRuntime().exec(command);
-        }catch(Exception e){
-            
-        }
-    }
-    
-    
-    public static Date fecha(){
-        try {
-            
-
+            cn = cc.conecct;
             String sql = "select current_date";
 
             Statement st = cn.createStatement();
@@ -154,19 +131,25 @@ public class Principal extends javax.swing.JFrame {
                 return rs.getDate(1);
 
             }
-            
+
         } catch (SQLException ex) {
-            Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("fecha:" +ex);
+           try {
+                cn.close();
+            } catch (SQLException ex1) {
+                Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex1);
+            }
+            cc.conectar();
+            
             return null;
         }
         return null;
-               
-        
-    }
-    public Time hora(){
-        try {
-           
 
+    }
+
+    public static  Time hora() {
+        try {
+            cn = cc.conecct;
             String sql = "select current_time";
 
             Statement st = cn.createStatement();
@@ -176,18 +159,24 @@ public class Principal extends javax.swing.JFrame {
                 return rs.getTime(1);
 
             }
-           
+
         } catch (SQLException ex) {
-            Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("hora2:" +ex);
+            try {
+                cn.close();
+            } catch (SQLException ex1) {
+                Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex1);
+            }
+            cc.conectar();
             return null;
         }
         return null;
-               
-        
+
     }
+
     public static String colocarNomDocente(String ced) {
         try {
-            
+
             String sql = "select nom_doc,ape_doc from docentes where ced_doc='" + cedula + "';";
 
             Statement st = cn.createStatement();
@@ -197,9 +186,11 @@ public class Principal extends javax.swing.JFrame {
                 return rs.getString("nom_doc") + " " + rs.getString("Ape_doc");
 
             }
-           
+
         } catch (SQLException ex) {
-            Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("colocar nombre");
+            cc.conectar();
+            
             return "";
         }
         return "";
@@ -209,18 +200,20 @@ public class Principal extends javax.swing.JFrame {
 
         ArrayList des = new ArrayList();
         try {
-            
+
             String sql = "select * from recordatorios where fec_rec='" + fecha + "' and ced_doc_per='" + cedula + "' and hor_rec = '" + hora + "' order by hor_rec asc";
 
             Statement st = cn.createStatement();
             ResultSet rs = st.executeQuery(sql);
-            
+
             while (rs.next()) {
                 des.add(rs.getString("des_rec"));
 
             }
         } catch (SQLException ex) {
-            Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("rechoy");
+            cc.conectar();
+           
 
         }
 
@@ -231,42 +224,44 @@ public class Principal extends javax.swing.JFrame {
 
         ArrayList des = new ArrayList();
         try {
-            
 
             String sql = "select * from jornadas where id_dia_per='" + dia + "' and ced_doc_per='" + cedula + "' and hor_emp = '" + hora + "' order by hor_emp asc";
 
             Statement st = cn.createStatement();
             ResultSet rs = st.executeQuery(sql);
-            
+
             while (rs.next()) {
                 des.add(rs.getString("des_jor"));
 
             }
         } catch (SQLException ex) {
-            Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("joyhoy");
 
+            cc.conectar();
+            
         }
 
         return des;
     }
-    
+
     public static ArrayList JorHoyFin(String dia, String hora) {
 
         ArrayList des = new ArrayList();
         try {
-            
 
             String sql = "select * from jornadas where id_dia_per='" + dia + "' and ced_doc_per='" + cedula + "' and hor_ter = '" + hora + "' order by hor_emp asc";
 
             Statement st = cn.createStatement();
             ResultSet rs = st.executeQuery(sql);
-            
+
             while (rs.next()) {
                 des.add(rs.getString("des_jor"));
 
             }
         } catch (SQLException ex) {
-            Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("jornada finr");
+            cc.conectar();
+            
 
         }
 
@@ -292,11 +287,11 @@ public class Principal extends javax.swing.JFrame {
                 return false;
             }
         };
-        
+
         tblRecordatorio.setModel(modeloTabla);
         SimpleDateFormat parseador = new SimpleDateFormat("dd-MM-yyyy");
         SimpleDateFormat parseador2 = new SimpleDateFormat("H:mm");
-        
+
         Calendar fecha = Calendar.getInstance();
         String sql = "select * from recordatorios where fec_rec ='" + parseador.format(fecha.getTime()) + "' and ced_doc_per = '" + cedula + "' and hor_rec >= '" + parseador2.format(fecha.getTime()) + "' order by hor_rec asc";
         try {
@@ -310,7 +305,9 @@ public class Principal extends javax.swing.JFrame {
                 modeloTabla.addRow(fila);
             }
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, "ERROR DE BASE: " + ex);
+            System.out.println("cargar tabla");
+            cc.conectar();
+            
         }
 
     }
@@ -346,66 +343,70 @@ public class Principal extends javax.swing.JFrame {
         @Override
         public void actionPerformed(ActionEvent e) {
             ///
-
-            ///////Aqui poner todo lo que se va a estar repitiento cada 5 segundos
-            Date fecha = fecha();
-            Time hora = hora();
+            try {
+                ///////Aqui poner todo lo que se va a estar repitiento cada 5 segundos
+                Date fecha = fecha();
+                Time hora = hora();
 //            SimpleDateFormat formateador = new SimpleDateFormat(" dd-MM-yyyy");
-            //System.out.println(hora);
+                //System.out.println(hora);
 //           Calendar cal = Calendar.getInstance();
-            
-            SimpleDateFormat formateador2 = new SimpleDateFormat("dd-MM-yyyy");
-            SimpleDateFormat formateador3 = new SimpleDateFormat("HH:mm:ss");
-            String fec = formateador2.format(fecha);
-            String hor = formateador3.format(hora.getTime());
-            
-            lblReloj.setText(hor);
-            lblfecha.setText(fec);
-            ArrayList des = recHoy(fec, hor);
 
-            if (des.size() > 0) {
-                for (int i = 0; i < des.size(); i++) {
-                    sonido();
-                    sonido();
-                    sonido();
-                    sonido();
-                    JOptionPane.showMessageDialog(null, "Recuerde: " + des.get(i));
-                }
+                SimpleDateFormat formateador2 = new SimpleDateFormat("dd-MM-yyyy");
+                SimpleDateFormat formateador3 = new SimpleDateFormat("HH:mm:ss");
+                String fec = formateador2.format(fecha);
+                String hor = formateador3.format(hora.getTime());
 
-            }
+                lblReloj.setText(hor);
+                lblfecha.setText(fec);
+                ArrayList des = recHoy(fec, hor);
 
-            SimpleDateFormat formateadorM = new SimpleDateFormat("mm:ss");
-            String minExt = formateadorM.format(hora); 
-            if (minExt.equals("00:00")) {
-                SimpleDateFormat formateadorH = new SimpleDateFormat("HH");
-                String horExt = formateadorH.format(hora);
-                System.out.println(horExt);
-                String dia = String.valueOf(fecha.getDay());
-
-                ArrayList desJorIni = JorHoyIni(dia, horExt + ":00:00");
-                ArrayList desJorFin = JorHoyFin(dia, horExt + ":00:00");
-                if (desJorIni.size() > 0) {
-                    for (int i = 0; i < desJorIni.size(); i++) {
+                if (des.size() > 0) {
+                    for (int i = 0; i < des.size(); i++) {
                         sonido();
                         sonido();
                         sonido();
                         sonido();
-                        JOptionPane.showMessageDialog(null, "Inicio de Jornada: " + desJorIni.get(i));
-                    }
-
-                }
-                
-                if (desJorFin.size() > 0) {
-                    for (int i = 0; i < desJorFin.size(); i++) {
-                        sonido();
-                        sonido();
-                        sonido();
-                        sonido();
-                        JOptionPane.showMessageDialog(null, "Fin de Jornada: " + desJorFin.get(i));
+                        JOptionPane.showMessageDialog(null, "Recuerde: " + des.get(i));
                     }
 
                 }
 
+                SimpleDateFormat formateadorM = new SimpleDateFormat("mm:ss");
+                String minExt = formateadorM.format(hora);
+                if (minExt.equals("00:00")) {
+                    SimpleDateFormat formateadorH = new SimpleDateFormat("HH");
+                    String horExt = formateadorH.format(hora);
+                    System.out.println(horExt);
+                    String dia = String.valueOf(fecha.getDay());
+
+                    ArrayList desJorIni = JorHoyIni(dia, horExt + ":00:00");
+                    ArrayList desJorFin = JorHoyFin(dia, horExt + ":00:00");
+                    if (desJorIni.size() > 0) {
+                        for (int i = 0; i < desJorIni.size(); i++) {
+                            sonido();
+                            sonido();
+                            sonido();
+                            sonido();
+                            JOptionPane.showMessageDialog(null, "Inicio de Jornada: " + desJorIni.get(i));
+                        }
+
+                    }
+
+                    if (desJorFin.size() > 0) {
+                        for (int i = 0; i < desJorFin.size(); i++) {
+                            sonido();
+                            sonido();
+                            sonido();
+                            sonido();
+                            JOptionPane.showMessageDialog(null, "Fin de Jornada: " + desJorFin.get(i));
+                        }
+
+                    }
+
+                }
+
+            } catch (Exception ef) {
+                        cc.conectar();
             }
 
             //////
@@ -625,12 +626,12 @@ public class Principal extends javax.swing.JFrame {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(lblNomDoc, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(57, 57, 57)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(btnJornada, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(4, 4, 4)
-                        .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
@@ -640,7 +641,7 @@ public class Principal extends javax.swing.JFrame {
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(17, 17, 17)
                                 .addComponent(jLabel3)))
-                        .addGap(18, 18, Short.MAX_VALUE)
+                        .addGap(18, 20, Short.MAX_VALUE)
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -661,9 +662,9 @@ public class Principal extends javax.swing.JFrame {
         // TODO add your handling code here:
         if (cc.CI.equals("false")) {
 //            JOptionPane.showMessageDialog(null, "Bienvenido.....!!");
-               this.setVisible(false);
-               registrar re = new registrar();
-               re.setVisible(true);
+            this.setVisible(false);
+            registrar re = new registrar();
+            re.setVisible(true);
         } else {
             lblNomDoc.setText(colocarNomDocente(cc.CI));
             //ocultar();
@@ -701,9 +702,9 @@ public class Principal extends javax.swing.JFrame {
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
         // TODO add your handling code here:
-        if(cedula.equals("1805037619")){
+        if (cedula.equals("1805037619")) {
             new usuarios(null, true).setVisible(true);
-        }else{
+        } else {
             JOptionPane.showMessageDialog(null, "Error no cuenta con los permisos necesarios");
         }
     }//GEN-LAST:event_jMenuItem1ActionPerformed
@@ -711,7 +712,7 @@ public class Principal extends javax.swing.JFrame {
     private void jMenu2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenu2ActionPerformed
         try {
             // TODO add your handling code here:
-            quitarRegistro();
+
             cc.ArchSimCedDoce();
             this.dispose();
             entrar ent = new entrar();
@@ -726,7 +727,7 @@ public class Principal extends javax.swing.JFrame {
         // TODO add your handling code here:
         try {
             // TODO add your handling code here:
-            quitarRegistro();
+
             cc.ArchSimCedDoce();
             this.dispose();
             entrar ent = new entrar();
@@ -738,7 +739,7 @@ public class Principal extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenu2MouseClicked
 
     private void btnJornadaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnJornadaActionPerformed
-         new Horarios(null, true, cedula).setVisible(true);
+        new Horarios(null, true, cedula).setVisible(true);
     }//GEN-LAST:event_btnJornadaActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
@@ -750,12 +751,12 @@ public class Principal extends javax.swing.JFrame {
         // TODO add your handling code here:
         try {
             // TODO add your handling code here:
-            quitarRegistro();
+
             cc.ArchSimCedDoce();
             this.dispose();
             registrar reg = new registrar();
             reg.setVisible(true);
-           // cn.close();
+            // cn.close();
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
         }
