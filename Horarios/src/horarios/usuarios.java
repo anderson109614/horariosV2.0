@@ -445,6 +445,8 @@ public class usuarios extends javax.swing.JDialog {
         // TODO add your handling code here:
 
         this.dispose();
+        registrar reg = new registrar();
+        reg.setVisible(true);
     }//GEN-LAST:event_btnLimpiarActionPerformed
 
     /**
