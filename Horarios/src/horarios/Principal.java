@@ -133,21 +133,21 @@ public class Principal extends javax.swing.JFrame {
             }
 
         } catch (SQLException ex) {
-            System.out.println("fecha:" +ex);
-           try {
+            System.out.println("fecha:" + ex);
+            try {
                 cn.close();
             } catch (SQLException ex1) {
                 Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex1);
             }
             cc.conectar();
-            
+
             return null;
         }
         return null;
 
     }
 
-    public static  Time hora() {
+    public static Time hora() {
         try {
             cn = cc.conecct;
             String sql = "select current_time";
@@ -161,7 +161,7 @@ public class Principal extends javax.swing.JFrame {
             }
 
         } catch (SQLException ex) {
-            System.out.println("hora2:" +ex);
+            System.out.println("hora2:" + ex);
             try {
                 cn.close();
             } catch (SQLException ex1) {
@@ -190,7 +190,7 @@ public class Principal extends javax.swing.JFrame {
         } catch (SQLException ex) {
             System.out.println("colocar nombre");
             cc.conectar();
-            
+
             return "";
         }
         return "";
@@ -213,7 +213,6 @@ public class Principal extends javax.swing.JFrame {
         } catch (SQLException ex) {
             System.out.println("rechoy");
             cc.conectar();
-           
 
         }
 
@@ -238,7 +237,7 @@ public class Principal extends javax.swing.JFrame {
             System.out.println("joyhoy");
 
             cc.conectar();
-            
+
         }
 
         return des;
@@ -261,7 +260,6 @@ public class Principal extends javax.swing.JFrame {
         } catch (SQLException ex) {
             System.out.println("jornada finr");
             cc.conectar();
-            
 
         }
 
@@ -307,7 +305,7 @@ public class Principal extends javax.swing.JFrame {
         } catch (SQLException ex) {
             System.out.println("cargar tabla");
             cc.conectar();
-            
+
         }
 
     }
@@ -406,7 +404,7 @@ public class Principal extends javax.swing.JFrame {
                 }
 
             } catch (Exception ef) {
-                        cc.conectar();
+                cc.conectar();
             }
 
             //////
@@ -438,12 +436,10 @@ public class Principal extends javax.swing.JFrame {
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
         jLabelEstadoConecion = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         menuiHorario = new javax.swing.JMenuItem();
         menuiRecordatorio = new javax.swing.JMenuItem();
-        jMenuItem1 = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
 
         menuDes.setLabel("popupMenu1");
@@ -533,13 +529,6 @@ public class Principal extends javax.swing.JFrame {
         jLabelEstadoConecion.setForeground(new java.awt.Color(51, 255, 51));
         jLabelEstadoConecion.setText("Conectado");
 
-        jButton1.setText("jButton1");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
-
         jMenu1.setText("Agregar");
 
         menuiHorario.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/calendar.png"))); // NOI18N
@@ -559,15 +548,6 @@ public class Principal extends javax.swing.JFrame {
             }
         });
         jMenu1.add(menuiRecordatorio);
-
-        jMenuItem1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/usuario.png"))); // NOI18N
-        jMenuItem1.setText("Docente");
-        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem1ActionPerformed(evt);
-            }
-        });
-        jMenu1.add(jMenuItem1);
 
         jMenuBar1.add(jMenu1);
 
@@ -619,8 +599,7 @@ public class Principal extends javax.swing.JFrame {
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(btnJornada, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
+                                    .addComponent(btnJornada, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabelEstadoConecion)
                         .addGap(0, 0, Short.MAX_VALUE)))
@@ -636,8 +615,6 @@ public class Principal extends javax.swing.JFrame {
                             .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(lblNomDoc, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnJornada, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -686,7 +663,9 @@ public class Principal extends javax.swing.JFrame {
 
     private void menuiRecordatorioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuiRecordatorioActionPerformed
         // TODO add your handling code here:
-        new recordatorios(null, true, cedula).setVisible(true);
+        this.dispose();
+        calendario cal = new calendario(cedula);
+        cal.setVisible(true);
 
     }//GEN-LAST:event_menuiRecordatorioActionPerformed
 
@@ -710,15 +689,6 @@ public class Principal extends javax.swing.JFrame {
 
 
     }//GEN-LAST:event_formWindowGainedFocus
-
-    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-        // TODO add your handling code here:
-        if (cedula.equals("1805037619")) {
-            new usuarios(null, true).setVisible(true);
-        } else {
-            JOptionPane.showMessageDialog(null, "Error no cuenta con los permisos necesarios");
-        }
-    }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     private void jMenu2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenu2ActionPerformed
         try {
@@ -755,7 +725,9 @@ public class Principal extends javax.swing.JFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
-        new recordatorios(null, true, cedula).setVisible(true);
+        this.dispose();
+        calendario cal = new calendario(cedula);
+        cal.setVisible(true);
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
@@ -772,14 +744,6 @@ public class Principal extends javax.swing.JFrame {
             Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jButton3ActionPerformed
-
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-        calendario cal = new calendario(cedula);
-        cal.setVisible(true);
-        
-        
-    }//GEN-LAST:event_jButton1ActionPerformed
 
     private void sonido() {
         // TODO add your handling code here:
@@ -835,7 +799,6 @@ public class Principal extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnJornada;
-    private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
@@ -845,7 +808,6 @@ public class Principal extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblNomDoc;
     private javax.swing.JLabel lblReloj;

@@ -11,24 +11,35 @@ import static horarios.Principal.cc;
 import static horarios.Principal.fecha;
 import static horarios.Principal.hora;
 import static horarios.Principal.recHoy;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeListenerProxy;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Time;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
 import javax.swing.Timer;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -44,49 +55,58 @@ public class calendario extends javax.swing.JFrame {
     Connection cn;
     String cedDoc;
     Timer t;
-  
+    int pv;
+    DefaultTableModel modeloTabla;
+
     public calendario(String ced) {
         initComponents();
-        
+
         cc = new Coneccion();
         cn = cc.conectar();
-        cedDoc=ced;
-      
-        dato= calendario.getDate();
-        SimpleDateFormat formateador2 = new SimpleDateFormat("dd-MM-yyyy");
-        String fec = formateador2.format(dato);
-        cargarDatosTabla(fec);
-        colorear();
-        
-        calendario.getDayChooser().addPropertyChangeListener("day",new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-     
+        cedDoc = ced;
 
-//To change body of generated methods, choose Tools | Templates.
-         dato= calendario.getDate();
+        dato = calendario.getDate();
         SimpleDateFormat formateador2 = new SimpleDateFormat("dd-MM-yyyy");
         String fec = formateador2.format(dato);
-        //System.out.println(fec);
         cargarDatosTabla(fec);
         colorear();
-                
-            
+        pnlFondo fondo = new pnlFondo(this.getWidth(), this.getHeight());
+        this.add(fondo, BorderLayout.CENTER);
+        this.setLocationRelativeTo(null);
+        EliminarSprm(tblRecordatorio);
+        calendario.getDayChooser().addPropertyChangeListener("day", new PropertyChangeListener() {
+            @Override
+
+            public void propertyChange(PropertyChangeEvent evt) {
+
+                // System.out.println(",,,,,");
+//To change body of generated methods, choose Tools | Templates.
+                dato = calendario.getDate();
+                SimpleDateFormat formateador2 = new SimpleDateFormat("dd-MM-yyyy");
+                String fec = formateador2.format(dato);
+                //System.out.println(fec);
+                cargarDatosTabla(fec);
+                colorear();
+
             }
+
         });
-        
-          t = new Timer(100, acciones);
-        
-       
-        
+
+        t = new Timer(100, acciones);
+
     }
+
     public calendario() {
         initComponents();
         cc = new Coneccion();
         cn = cc.conectar();
-        cedDoc="1805037619";
+        cedDoc = "1805037619";
+        pnlFondo fondo = new pnlFondo(this.getWidth(), this.getHeight());
+        this.add(fondo, BorderLayout.CENTER);
+        this.setLocationRelativeTo(null);
+        EliminarSprm(tblRecordatorio);
     }
-    
+
     private ActionListener acciones = new ActionListener() {
 
         @Override
@@ -95,7 +115,6 @@ public class calendario extends javax.swing.JFrame {
             //////
         }
     };
-
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -106,13 +125,101 @@ public class calendario extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        GRecordatorio = new javax.swing.JDialog();
+        spnHora = new javax.swing.JSpinner();
+        spnMinutos = new javax.swing.JSpinner();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        txtaDescripcion = new javax.swing.JTextArea();
+        jLabel3 = new javax.swing.JLabel();
+        btnAgregar = new javax.swing.JButton();
+        btnLimpiar = new javax.swing.JButton();
+        jLabel2 = new javax.swing.JLabel();
         calendario = new com.toedter.calendar.JCalendar();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblRecordatorio = new javax.swing.JTable();
         jLabel1 = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
+
+        spnHora.setModel(new javax.swing.SpinnerNumberModel(0, 0, 23, 1));
+
+        spnMinutos.setModel(new javax.swing.SpinnerNumberModel(0, 0, 59, 1));
+
+        txtaDescripcion.setColumns(20);
+        txtaDescripcion.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        txtaDescripcion.setRows(5);
+        jScrollPane2.setViewportView(txtaDescripcion);
+
+        jLabel3.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel3.setText("Descripción:");
+
+        btnAgregar.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        btnAgregar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/guardar.png"))); // NOI18N
+        btnAgregar.setText("Guardar");
+        btnAgregar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAgregarActionPerformed(evt);
+            }
+        });
+
+        btnLimpiar.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        btnLimpiar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/cancelar.png"))); // NOI18N
+        btnLimpiar.setText("Cancelar");
+        btnLimpiar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLimpiarActionPerformed(evt);
+            }
+        });
+
+        jLabel2.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel2.setText("Hora:");
+
+        javax.swing.GroupLayout GRecordatorioLayout = new javax.swing.GroupLayout(GRecordatorio.getContentPane());
+        GRecordatorio.getContentPane().setLayout(GRecordatorioLayout);
+        GRecordatorioLayout.setHorizontalGroup(
+            GRecordatorioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(GRecordatorioLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(GRecordatorioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel3)
+                    .addComponent(jLabel2))
+                .addGap(18, 18, 18)
+                .addGroup(GRecordatorioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(GRecordatorioLayout.createSequentialGroup()
+                        .addComponent(spnHora, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(spnMinutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(GRecordatorioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnAgregar, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnLimpiar))
+                .addGap(0, 10, Short.MAX_VALUE))
+        );
+        GRecordatorioLayout.setVerticalGroup(
+            GRecordatorioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(GRecordatorioLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(GRecordatorioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(GRecordatorioLayout.createSequentialGroup()
+                        .addComponent(btnAgregar)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnLimpiar))
+                    .addGroup(GRecordatorioLayout.createSequentialGroup()
+                        .addGroup(GRecordatorioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel2)
+                            .addComponent(spnHora, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(spnMinutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(GRecordatorioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel3)
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setUndecorated(true);
+        setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowOpened(java.awt.event.WindowEvent evt) {
                 formWindowOpened(evt);
@@ -156,7 +263,23 @@ public class calendario extends javax.swing.JFrame {
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
         jLabel1.setText("RECORDATORIOS");
 
+        jButton1.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/cancelar.png"))); // NOI18N
         jButton1.setText("Cancelar");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        jButton2.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/set-alarm.png"))); // NOI18N
+        jButton2.setText("Nuevo");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -165,20 +288,20 @@ public class calendario extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(calendario, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 514, Short.MAX_VALUE))
-                        .addContainerGap())
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(jLabel1)
+                        .addGap(151, 151, 151))
+                    .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(jButton1)
-                                .addContainerGap())
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(jLabel1)
-                                .addGap(151, 151, 151))))))
+                            .addComponent(jScrollPane1)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(calendario, javax.swing.GroupLayout.PREFERRED_SIZE, 485, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addContainerGap())))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -186,18 +309,22 @@ public class calendario extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(calendario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton1)
-                .addGap(8, 8, 8))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(calendario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jButton2)
+                        .addGap(18, 18, 18)
+                        .addComponent(jButton1)))
+                .addGap(23, 23, 23))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-        public void pintar(String fecha) {
+    public void pintar(String fecha) {
         if (calendario.getYearChooser().getYear() == Integer.valueOf(fecha.substring(6, 10))) {
             if (calendario.getMonthChooser().getMonth() + 1 == Integer.valueOf(fecha.substring(3, 5))) {
                 int sa = 0;
@@ -211,7 +338,6 @@ public class calendario extends javax.swing.JFrame {
         }
     }
 
-
     public void colorear() {
         ArrayList<String> f = new ArrayList<String>();
         SimpleDateFormat parseador = new SimpleDateFormat("dd/MM/yyyy");
@@ -220,57 +346,262 @@ public class calendario extends javax.swing.JFrame {
 //        System.out.println(txtUsuario.getText());
         String sql = "SELECT fec_rec FROM recordatorios WHERE ced_doc_per='" + cedDoc + "'";
         calendario.setSundayForeground(Color.RED);
-        calendario.setDecorationBackgroundColor(Color.yellow);
+        //calendario.setDecorationBackgroundColor(Color.yellow);
         calendario.setDecorationBackgroundVisible(true);
-        
+
         Statement ps;
         try {
             ps = cn.createStatement();
             ResultSet rs = ps.executeQuery(sql);
             while (rs.next()) {
-               f.add(parseador.format(rs.getDate(1)));
+                f.add(parseador.format(rs.getDate(1)));
             }
-            
+
             for (int i = 0; i < f.size(); i++) {
-               pintar(f.get(i));
+                pintar(f.get(i));
             }
         } catch (SQLException ex) {
             //Logger.getLogger(PrincipalAlarma.class.getName()).log(Level.SEVERE, null, ex);
             //System.out.println(ex);
         }
     }
-    
-    
+
     Date dato;
     private void calendarioMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_calendarioMouseClicked
         // TODO add your handling code here:
-        
-       
+        System.out.println("....");
+        if (evt.getClickCount() == 2) {
+            JOptionPane.showMessageDialog(null, ".I.");
+
+        }
+
+
     }//GEN-LAST:event_calendarioMouseClicked
 
     private void calendarioPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_calendarioPropertyChange
         // TODO add your handling code here:
-        
+
     }//GEN-LAST:event_calendarioPropertyChange
 
     private void calendarioMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_calendarioMousePressed
         // TODO add your handling code here:
-       
-        
+
+
     }//GEN-LAST:event_calendarioMousePressed
 
     private void calendarioAncestorMoved(java.awt.event.HierarchyEvent evt) {//GEN-FIRST:event_calendarioAncestorMoved
         // TODO add your handling code here:
-    
+
     }//GEN-LAST:event_calendarioAncestorMoved
 
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
         // TODO add your handling code here:
-      //  t.start();
+        //  t.start();
     }//GEN-LAST:event_formWindowOpened
-DefaultTableModel modeloTabla;
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+//         dato= calendario.getDate();
+//        SimpleDateFormat formateador2 = new SimpleDateFormat("dd-MM-yyyy");
+//        String fec = formateador2.format(dato);
+//        System.out.println(fec);
+//        recordatorios rec = new recordatorios(fec);
+//        rec.setVisible(true);
+        GRecordatorio.setVisible(true);
+        GRecordatorio.setSize(480, 190);
+        GRecordatorio.setResizable(false);
+        GRecordatorio.setLocationRelativeTo(null);
+//    GRecordatorio.setUndecorated(false);
+        GRecordatorio.setModal(true);
+        pnlFondo fondo = new pnlFondo(this.getWidth(), this.getHeight());
+        GRecordatorio.add(fondo, BorderLayout.CENTER);
+
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    public void cargarDatosTabla() {
+        String titulos[] = {"ID", "FECHA", "HORA", "DESCRIPCIÓN"};
+        modeloTabla = new DefaultTableModel(null, titulos) {
+
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+//        tblRecordatorio.setModel(modeloTabla);
+        //      tblRecordatorio.getTableHeader().setReorderingAllowed(false);
+
+        cc = new Coneccion();
+        Connection cn = cc.conectar();
+
+        String sql = "select * from recordatorios where ced_doc_per='" + cedDoc + "' order by fec_rec asc";
+
+        try {
+            Statement st = cn.createStatement();
+            ResultSet rs = st.executeQuery(sql);
+            String fila[] = new String[4];
+            while (rs.next()) {
+                fila[0] = rs.getString("id_rec");
+                fila[1] = rs.getString("fec_rec");
+                fila[2] = rs.getString("hor_rec");
+                fila[3] = rs.getString("des_rec");
+                modeloTabla.addRow(fila);
+            }
+            cn.close();
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, "Error de base: " + ex);
+        }
+
+    }
+
+    public void guardarRecordatorio() {
+        dato = calendario.getDate();
+        SimpleDateFormat formateador2 = new SimpleDateFormat("dd-MM-yyyy");
+        String fech = formateador2.format(dato);
+        Connection cn = cc.conectar();
+        try {
+            SimpleDateFormat parseador = new SimpleDateFormat("dd-MM-yyyy");
+            SimpleDateFormat formateador = new SimpleDateFormat("H:mm");
+            //Hora Inicio
+            Calendar fa = Calendar.getInstance();
+            fa.setTime(Principal.fecha());
+            //System.out.println(Principal.fecha());
+            Calendar fecha = Calendar.getInstance();
+            fecha.setTime(parseador.parse(fech));
+            //Hora inicio recuperada base
+            Calendar h = Calendar.getInstance();
+            h.setTime(Principal.hora());
+//            System.out.println(parseador.format(fa.getTime()));
+//            System.out.println(formateador.format(h.getTime()));
+//System.out.println(parseador.format(fecha.getTime()));
+            if (fecha.compareTo(fa) < 0) {
+                // System.out.println("fjh");
+                JOptionPane.showMessageDialog(null, "Error la fecha ingresada es inválida");
+                //calendario.requestFocus();
+            } else if (fecha.compareTo(fa) == 0) {
+                int horaAct = h.get(Calendar.HOUR_OF_DAY);
+                int horaIng = Integer.valueOf(spnHora.getValue().toString());
+                if (horaIng < horaAct) {
+                    JOptionPane.showMessageDialog(null, "Error la hora ingresada es inválida");
+                    spnHora.requestFocus();
+                } else if (horaAct == horaIng) {
+                    int minAct = h.get(Calendar.MINUTE);
+                    int minIng = Integer.valueOf(spnMinutos.getValue().toString());
+                    if (minIng <= minAct) {
+                        JOptionPane.showMessageDialog(null, "Error los minutos ingresados son inválidos");
+                    } else {
+
+                        String hora = spnHora.getValue().toString() + ":" + spnMinutos.getValue().toString();
+                        String sql = "insert into recordatorios values(nextval('seq_rec'), '" + parseador.format(fecha.getTime()) + "', '" + hora + "' ,'" + cedDoc + "', '" + txtaDescripcion.getText() + "')";
+                        PreparedStatement psd = cn.prepareStatement(sql);
+                        int n = psd.executeUpdate();
+                        if (n > 0) {
+                            GRecordatorio.setVisible(false);
+                            JOptionPane.showMessageDialog(null, "Recordario insertado correctamente!");
+
+                            //cargarDatosTabla();
+                        }
+                        cn.close();
+                    }
+                } else {
+                    String hora = spnHora.getValue().toString() + ":" + spnMinutos.getValue().toString();
+                    String sql = "insert into recordatorios values(nextval('seq_rec'), '" + parseador.format(fecha.getTime()) + "', '" + hora + "' ,'" + cedDoc + "', '" + txtaDescripcion.getText() + "')";
+                    PreparedStatement psd = cn.prepareStatement(sql);
+                    int n = psd.executeUpdate();
+                    if (n > 0) {
+                        GRecordatorio.setVisible(false);
+                        JOptionPane.showMessageDialog(null, "Recordario insertado correctamente!");
+
+                        // cargarDatosTabla();
+                    }
+                    cn.close();
+                }
+            } else {
+
+                String hora = spnHora.getValue().toString() + ":" + spnMinutos.getValue().toString();
+                String sql = "insert into recordatorios values(nextval('seq_rec'), '" + parseador.format(fecha.getTime()) + "', '" + hora + "' ,'" + cedDoc + "', '" + txtaDescripcion.getText() + "')";
+                PreparedStatement psd = cn.prepareStatement(sql);
+                int n = psd.executeUpdate();
+                if (n > 0) {
+                    GRecordatorio.setVisible(false);
+                    JOptionPane.showMessageDialog(null, "Recordario insertado correctamente!");
+                    //cargarDatosTabla();
+
+                }
+                cn.close();
+            }
+            cn.close();
+        } catch (ParseException ex) {
+            JOptionPane.showMessageDialog(null, "Error fechas: " + ex);
+
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, ":" + ex);
+
+        }
+
+    }
+
+    public void EliminarSprm(JTable a) {
+        a.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent lse) {
+                pv = 1;
+                a.addKeyListener(new KeyAdapter() {
+                    public void keyPressed(KeyEvent e) {
+                        if (a.getSelectedRow() != -1 && pv == 1) {
+                            pv++;
+                            int fila = a.getSelectedRow();
+                            if (e.getKeyChar() == KeyEvent.VK_DELETE) {
+                                cc = new Coneccion();
+                                Connection cn = cc.conectar();
+                                String sql = "";
+                                sql = "delete from recordatorios where id_rec='" + a.getValueAt(fila, 0).toString() + "'";
+                                int opc = JOptionPane.showConfirmDialog(null, "¿Desea Eliminar?");
+                                if (opc == 0) {
+                                    try {
+                                        PreparedStatement pst;
+                                        pst = cn.prepareStatement(sql);
+                                        pst.executeUpdate();
+                                        dato = calendario.getDate();
+                                        SimpleDateFormat formateador2 = new SimpleDateFormat("dd-MM-yyyy");
+                                        String fec = formateador2.format(dato);
+                                        cargarDatosTabla(fec);
+                                    } catch (SQLException ex) {
+                                        JOptionPane.showMessageDialog(null, ex);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+
+    private void btnAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarActionPerformed
+        guardarRecordatorio();
+
+        dato = calendario.getDate();
+        SimpleDateFormat formateador2 = new SimpleDateFormat("dd-MM-yyyy");
+        String fec = formateador2.format(dato);
+        cargarDatosTabla(fec);
+
+    }//GEN-LAST:event_btnAgregarActionPerformed
+
+    private void btnLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarActionPerformed
+        GRecordatorio.setVisible(false);
+
+    }//GEN-LAST:event_btnLimpiarActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        this.dispose();
+        Principal p = new Principal(cedDoc);
+        p.setVisible(true);
+    }//GEN-LAST:event_jButton1ActionPerformed
+
     public void cargarDatosTabla(String fecha) {
-        String titulos[] = {"ID","FECHA", "HORA", "DESCRIPCIÓN"};
+        String titulos[] = {"ID", "FECHA", "HORA", "DESCRIPCIÓN"};
         modeloTabla = new DefaultTableModel(null, titulos) {
 
             @Override
@@ -281,10 +612,8 @@ DefaultTableModel modeloTabla;
         tblRecordatorio.setModel(modeloTabla);
         tblRecordatorio.getTableHeader().setReorderingAllowed(false);
 
-        
-
         String sql = "select * from recordatorios where ced_doc_per='" + cedDoc + "' "
-                + "AND fec_rec= '"+fecha+"'"
+                + "AND fec_rec= '" + fecha + "'"
                 + " order by fec_rec asc";
         //System.out.println(sql);
         try {
@@ -298,13 +627,13 @@ DefaultTableModel modeloTabla;
                 fila[3] = rs.getString("des_rec");
                 modeloTabla.addRow(fila);
             }
-            
+
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, "Error de base: " + ex);
         }
 
     }
-    
+
     /**
      * @param args the command line arguments
      */
@@ -341,10 +670,20 @@ DefaultTableModel modeloTabla;
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JDialog GRecordatorio;
+    private javax.swing.JButton btnAgregar;
+    private javax.swing.JButton btnLimpiar;
     private com.toedter.calendar.JCalendar calendario;
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JSpinner spnHora;
+    private javax.swing.JSpinner spnMinutos;
     private javax.swing.JTable tblRecordatorio;
+    private javax.swing.JTextArea txtaDescripcion;
     // End of variables declaration//GEN-END:variables
 }

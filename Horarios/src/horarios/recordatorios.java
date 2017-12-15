@@ -6,6 +6,7 @@
 package horarios;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.sql.Connection;
@@ -15,6 +16,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,14 +39,14 @@ public class recordatorios extends javax.swing.JDialog {
     String cedDoc = "";
     DefaultTableModel modeloTabla;
     int pv;
-
-    public recordatorios() {
+    String fech="";
+    public recordatorios(String fec) {
         initComponents();
-        
+        fech=fec;
         cargarDatosTabla();
         cedDoc = "1805037619";
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        fechaRecordatorio.setDateFormat(sdf);
+        //calendario.setDateFormat(sdf);
         pnlFondo fondo = new pnlFondo(this.getWidth(), this.getHeight());
         this.add(fondo, BorderLayout.CENTER);
         this.setLocationRelativeTo(null);
@@ -53,11 +55,11 @@ public class recordatorios extends javax.swing.JDialog {
     public recordatorios(java.awt.Frame parent, boolean modal,String cedula) {
         super(parent,modal);
         initComponents();
-        EliminarSprm(tblRecordatorio);
+
         cedDoc = cedula;
         cargarDatosTabla();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        fechaRecordatorio.setDateFormat(sdf);
+        //calendario.setDateFormat(sdf);
         pnlFondo fondo = new pnlFondo(this.getWidth(), this.getHeight());
         this.add(fondo, BorderLayout.CENTER);
         this.setLocationRelativeTo(null);
@@ -73,8 +75,6 @@ public class recordatorios extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
-        fechaRecordatorio = new datechooser.beans.DateChooserCombo();
         jLabel2 = new javax.swing.JLabel();
         spnHora = new javax.swing.JSpinner();
         spnMinutos = new javax.swing.JSpinner();
@@ -83,18 +83,9 @@ public class recordatorios extends javax.swing.JDialog {
         jLabel3 = new javax.swing.JLabel();
         btnAgregar = new javax.swing.JButton();
         btnLimpiar = new javax.swing.JButton();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        tblRecordatorio = new javax.swing.JTable();
 
         setBackground(new java.awt.Color(255, 255, 255));
         setUndecorated(true);
-
-        jLabel1.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jLabel1.setText("Fecha:");
-
-        fechaRecordatorio.setCalendarPreferredSize(new java.awt.Dimension(350, 300));
-        fechaRecordatorio.setFieldFont(new java.awt.Font("Tahoma", java.awt.Font.PLAIN, 12));
-        fechaRecordatorio.setNavigateFont(new java.awt.Font("Serif", java.awt.Font.PLAIN, 13));
 
         jLabel2.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel2.setText("Hora:");
@@ -129,49 +120,27 @@ public class recordatorios extends javax.swing.JDialog {
             }
         });
 
-        tblRecordatorio.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {},
-                {},
-                {},
-                {}
-            },
-            new String [] {
-
-            }
-        ));
-        jScrollPane1.setViewportView(tblRecordatorio);
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel3)
+                    .addComponent(jLabel2))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel3)
-                                .addGap(18, 18, 18)
-                                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel1)
-                                    .addComponent(jLabel2))
-                                .addGap(51, 51, 51)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(spnHora, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(18, 18, 18)
-                                        .addComponent(spnMinutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addComponent(fechaRecordatorio, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(btnAgregar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(btnLimpiar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(0, 10, Short.MAX_VALUE))
+                        .addComponent(spnHora, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(spnMinutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnAgregar, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnLimpiar))
+                .addGap(0, 13, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -183,20 +152,14 @@ public class recordatorios extends javax.swing.JDialog {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnLimpiar))
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jLabel1)
-                            .addComponent(fechaRecordatorio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel2)
                             .addComponent(spnHora, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(spnMinutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel3)
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -212,8 +175,8 @@ public class recordatorios extends javax.swing.JDialog {
                 return false;
             }
         };
-        tblRecordatorio.setModel(modeloTabla);
-        tblRecordatorio.getTableHeader().setReorderingAllowed(false);
+//        tblRecordatorio.setModel(modeloTabla);
+  //      tblRecordatorio.getTableHeader().setReorderingAllowed(false);
 
         cc = new Coneccion();
         Connection cn = cc.conectar();
@@ -238,40 +201,10 @@ public class recordatorios extends javax.swing.JDialog {
 
     }
     
-    public void EliminarSprm(JTable a) {
-        a.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent lse) {
-                pv=1;
-                a.addKeyListener(new KeyAdapter() {
-                    public void keyPressed(KeyEvent e) {
-                        if (a.getSelectedRow() != -1 && pv==1) {
-                            pv++;
-                            int fila = a.getSelectedRow();
-                            if (e.getKeyChar() == KeyEvent.VK_DELETE) {
-                                cc = new Coneccion();
-                                Connection cn = cc.conectar();
-                                String sql = "";
-                                sql = "delete from recordatorios where id_rec='" + a.getValueAt(fila, 0).toString() + "'";
-                                int opc = JOptionPane.showConfirmDialog(null, "¿Desea Eliminar?");
-                                if (opc == 0) {
-                                    try {
-                                        PreparedStatement pst;
-                                        pst = cn.prepareStatement(sql);
-                                        pst.executeUpdate();
-                                        cargarDatosTabla();
-                                    } catch (SQLException ex) {
-                                        JOptionPane.showMessageDialog(null, ex);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-        });
-    }
-
+    
+    
+    
+    
     private void btnLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarActionPerformed
         this.dispose();
 
@@ -280,24 +213,32 @@ public class recordatorios extends javax.swing.JDialog {
 
     private void btnAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarActionPerformed
         guardarRecordatorio();
+        this.setVisible(false);
+        calendario c = new calendario();
+        c.cargarDatosTabla(fech);
     }//GEN-LAST:event_btnAgregarActionPerformed
 
     public void guardarRecordatorio() {
         Connection cn = cc.conectar();
         try {
-            SimpleDateFormat parseador = new SimpleDateFormat("yyyy-MM-dd");
+            SimpleDateFormat parseador = new SimpleDateFormat("dd-MM-yyyy");
             SimpleDateFormat formateador = new SimpleDateFormat("H:mm");
             //Hora Inicio
             Calendar fa = Calendar.getInstance();
-            fa.setTime(Principal.hora());
+            fa.setTime(Principal.fecha());
+            //System.out.println(Principal.fecha());
             Calendar fecha = Calendar.getInstance();
-            fecha.setTime(parseador.parse(fechaRecordatorio.getText()));
+            fecha.setTime(parseador.parse(this.fech));
             //Hora inicio recuperada base
             Calendar h = Calendar.getInstance();
-
+            h.setTime(Principal.hora());
+//            System.out.println(parseador.format(fa.getTime()));
+//            System.out.println(formateador.format(h.getTime()));
+//System.out.println(parseador.format(fecha.getTime()));
             if (fecha.compareTo(fa) < 0) {
+               // System.out.println("fjh");
                 JOptionPane.showMessageDialog(null, "Error la fecha ingresada es inválida");
-                fechaRecordatorio.requestFocus();
+                //calendario.requestFocus();
             } else if (fecha.compareTo(fa) == 0) {
                 int horaAct = h.get(Calendar.HOUR_OF_DAY);
                 int horaIng = Integer.valueOf(spnHora.getValue().toString());
@@ -391,7 +332,7 @@ public class recordatorios extends javax.swing.JDialog {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new recordatorios().setVisible(true);
+                new recordatorios("").setVisible(true);
             }
         });
     }
@@ -399,15 +340,11 @@ public class recordatorios extends javax.swing.JDialog {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAgregar;
     private javax.swing.JButton btnLimpiar;
-    private datechooser.beans.DateChooserCombo fechaRecordatorio;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSpinner spnHora;
     private javax.swing.JSpinner spnMinutos;
-    private javax.swing.JTable tblRecordatorio;
     private javax.swing.JTextArea txtaDescripcion;
     // End of variables declaration//GEN-END:variables
 }
