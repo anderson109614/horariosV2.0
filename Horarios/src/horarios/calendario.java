@@ -5,7 +5,15 @@
  */
 package horarios;
 
+import static horarios.Principal.JorHoyFin;
+import static horarios.Principal.JorHoyIni;
+import static horarios.Principal.cc;
+import static horarios.Principal.fecha;
+import static horarios.Principal.hora;
+import static horarios.Principal.recHoy;
 import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeListenerProxy;
@@ -13,10 +21,14 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import javax.swing.JOptionPane;
+import javax.swing.Timer;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -31,12 +43,15 @@ public class calendario extends javax.swing.JFrame {
     Coneccion cc;
     Connection cn;
     String cedDoc;
+    Timer t;
   
     public calendario(String ced) {
         initComponents();
+        
         cc = new Coneccion();
         cn = cc.conectar();
         cedDoc=ced;
+      
         dato= calendario.getDate();
         SimpleDateFormat formateador2 = new SimpleDateFormat("dd-MM-yyyy");
         String fec = formateador2.format(dato);
@@ -54,10 +69,16 @@ public class calendario extends javax.swing.JFrame {
         String fec = formateador2.format(dato);
         //System.out.println(fec);
         cargarDatosTabla(fec);
+        colorear();
                 
             
             }
         });
+        
+          t = new Timer(100, acciones);
+        
+       
+        
     }
     public calendario() {
         initComponents();
@@ -65,6 +86,16 @@ public class calendario extends javax.swing.JFrame {
         cn = cc.conectar();
         cedDoc="1805037619";
     }
+    
+    private ActionListener acciones = new ActionListener() {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            colorear();
+            //////
+        }
+    };
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -82,10 +113,30 @@ public class calendario extends javax.swing.JFrame {
         jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowOpened(java.awt.event.WindowEvent evt) {
+                formWindowOpened(evt);
+            }
+        });
 
+        calendario.addHierarchyBoundsListener(new java.awt.event.HierarchyBoundsListener() {
+            public void ancestorMoved(java.awt.event.HierarchyEvent evt) {
+                calendarioAncestorMoved(evt);
+            }
+            public void ancestorResized(java.awt.event.HierarchyEvent evt) {
+            }
+        });
         calendario.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 calendarioMouseClicked(evt);
+            }
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                calendarioMousePressed(evt);
+            }
+        });
+        calendario.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                calendarioPropertyChange(evt);
             }
         });
 
@@ -163,6 +214,7 @@ public class calendario extends javax.swing.JFrame {
 
     public void colorear() {
         ArrayList<String> f = new ArrayList<String>();
+        SimpleDateFormat parseador = new SimpleDateFormat("dd/MM/yyyy");
 //        conexion cc = new conexion();
 //        Connection cn = cc.conectar();
 //        System.out.println(txtUsuario.getText());
@@ -170,20 +222,21 @@ public class calendario extends javax.swing.JFrame {
         calendario.setSundayForeground(Color.RED);
         calendario.setDecorationBackgroundColor(Color.yellow);
         calendario.setDecorationBackgroundVisible(true);
-        calendario.getDayChooser().getDayPanel().getComponent(5).setBackground(Color.BLUE);
+        
         Statement ps;
         try {
             ps = cn.createStatement();
             ResultSet rs = ps.executeQuery(sql);
             while (rs.next()) {
-                f.add(rs.getString(1));
+               f.add(parseador.format(rs.getDate(1)));
             }
+            
             for (int i = 0; i < f.size(); i++) {
-               // pintar(f.get(i));
+               pintar(f.get(i));
             }
         } catch (SQLException ex) {
             //Logger.getLogger(PrincipalAlarma.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println(ex);
+            //System.out.println(ex);
         }
     }
     
@@ -192,8 +245,29 @@ public class calendario extends javax.swing.JFrame {
     private void calendarioMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_calendarioMouseClicked
         // TODO add your handling code here:
         
-        
+       
     }//GEN-LAST:event_calendarioMouseClicked
+
+    private void calendarioPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_calendarioPropertyChange
+        // TODO add your handling code here:
+        
+    }//GEN-LAST:event_calendarioPropertyChange
+
+    private void calendarioMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_calendarioMousePressed
+        // TODO add your handling code here:
+       
+        
+    }//GEN-LAST:event_calendarioMousePressed
+
+    private void calendarioAncestorMoved(java.awt.event.HierarchyEvent evt) {//GEN-FIRST:event_calendarioAncestorMoved
+        // TODO add your handling code here:
+    
+    }//GEN-LAST:event_calendarioAncestorMoved
+
+    private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
+        // TODO add your handling code here:
+      //  t.start();
+    }//GEN-LAST:event_formWindowOpened
 DefaultTableModel modeloTabla;
     public void cargarDatosTabla(String fecha) {
         String titulos[] = {"ID","FECHA", "HORA", "DESCRIPCIÓN"};
@@ -212,7 +286,7 @@ DefaultTableModel modeloTabla;
         String sql = "select * from recordatorios where ced_doc_per='" + cedDoc + "' "
                 + "AND fec_rec= '"+fecha+"'"
                 + " order by fec_rec asc";
-        System.out.println(sql);
+        //System.out.println(sql);
         try {
             Statement st = cn.createStatement();
             ResultSet rs = st.executeQuery(sql);
