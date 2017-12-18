@@ -103,7 +103,7 @@ public class Principal extends javax.swing.JFrame {
             //cc.ArchCedDoce("1805037619");
             pnlFondo fondo = new pnlFondo(this.getWidth(), this.getHeight());
             this.add(fondo, BorderLayout.CENTER);
-            lblNomDoc.setText(colocarNomDocente("1805037619"));
+            lblNomDoc.setText(colocarNomDocente(cc.CI));
             t = new Timer(1000, acciones);
             imageicon = new ImageIcon(this.getClass().getResource("/imagenes/robot.png"));
             this.setIconImage(imageicon.getImage());
@@ -111,7 +111,7 @@ public class Principal extends javax.swing.JFrame {
             this.setLocationRelativeTo(null);
             noCerrer();
             cargarTablaRecordatorios();
-            cedula = "1805037619";
+            cedula = cc.CI;
 
         } catch (Exception ex) {
             System.out.println("constructor");
